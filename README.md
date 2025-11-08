@@ -103,6 +103,37 @@ resume-ats-evaluator/
 - ✅ Proper text structure and formatting
 - ✅ Avoidance of special characters that break parsing
 
+## Deployment
+
+### Deploying to Vercel
+
+The easiest way to deploy this Next.js app is using [Vercel](https://vercel.com):
+
+1. **Push your code to GitHub** (if you haven't already):
+   ```bash
+   git remote add origin https://github.com/YOUR_USERNAME/resume-ats-evaluator.git
+   git branch -M main
+   git push -u origin main
+   ```
+
+2. **Deploy to Vercel**:
+   - Go to [vercel.com/new](https://vercel.com/new)
+   - Import your GitHub repository
+   - Vercel will automatically detect Next.js and configure the build settings
+   - Click "Deploy"
+
+   Alternatively, use the Vercel CLI:
+   ```bash
+   npm install -g vercel
+   vercel
+   ```
+
+3. **Your app will be live** at a URL like `https://resume-ats-evaluator.vercel.app`
+
+### Environment Variables
+
+No environment variables are required for basic functionality. The app works out of the box!
+
 ## License
 
 MIT
