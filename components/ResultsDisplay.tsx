@@ -236,7 +236,7 @@ export default function ResultsDisplay({ result }: ResultsDisplayProps) {
             ATS Best Practice Tips
           </h3>
           <p className="text-sm text-gray-600 mb-6">
-            Based on your evaluation, here are specific tips to improve your resume's ATS compatibility:
+            Based on your evaluation, here are specific tips to improve your resume&apos;s ATS compatibility:
           </p>
           <div className="space-y-6">
             {result.relevantTips.map((tip) => (
@@ -279,4 +279,3 @@ export default function ResultsDisplay({ result }: ResultsDisplayProps) {
     </div>
   )
 }
-
