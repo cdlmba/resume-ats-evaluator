@@ -35,28 +35,13 @@ export default function Home() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const handleEvaluate = async (file: File, jobDescriptionUrl: string) => {
+  const handleEvaluate = async (resumeText: string, jobDescriptionUrl: string) => {
     setLoading(true)
     setError(null)
     setEvaluationResult(null)
 
     try {
-      // Step 1: Parse PDF
-      const formData = new FormData()
-      formData.append('file', file)
-
-      const parseResponse = await fetch('/api/parse-pdf', {
-        method: 'POST',
-        body: formData,
-      })
-
-      if (!parseResponse.ok) {
-        throw new Error('Failed to parse PDF')
-      }
-
-      const { text: resumeText } = await parseResponse.json()
-
-      // Step 2: Fetch job description
+      // Step 1: Fetch job description
       const jobResponse = await fetch('/api/fetch-job-description', {
         method: 'POST',
         headers: {
@@ -71,7 +56,7 @@ export default function Home() {
 
       const { text: jobDescriptionText } = await jobResponse.json()
 
-      // Step 3: Evaluate
+      // Step 2: Evaluate
       const evalResponse = await fetch('/api/evaluate', {
         method: 'POST',
         headers: {
@@ -80,7 +65,7 @@ export default function Home() {
         body: JSON.stringify({
           resumeText,
           jobDescriptionText,
-          fileName: file.name,
+          fileName: 'resume.txt',
         }),
       })
 
@@ -130,4 +115,3 @@ export default function Home() {
     </main>
   )
 }
-

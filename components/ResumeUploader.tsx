@@ -3,12 +3,13 @@
 import { useState } from 'react'
 
 interface ResumeUploaderProps {
-  onEvaluate: (file: File, jobDescriptionUrl: string) => void
+  onEvaluate: (resumeText: string, jobDescriptionUrl: string) => void
   loading: boolean
 }
 
 export default function ResumeUploader({ onEvaluate, loading }: ResumeUploaderProps) {
   const [file, setFile] = useState<File | null>(null)
+  const [resumeText, setResumeText] = useState('')
   const [jobDescriptionUrl, setJobDescriptionUrl] = useState('')
   const [dragActive, setDragActive] = useState(false)
 
@@ -22,36 +23,46 @@ export default function ResumeUploader({ onEvaluate, loading }: ResumeUploaderPr
     }
   }
 
-  const handleDrop = (e: React.DragEvent) => {
+  const handleDrop = async (e: React.DragEvent) => {
     e.preventDefault()
     e.stopPropagation()
     setDragActive(false)
 
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
       const droppedFile = e.dataTransfer.files[0]
-      if (droppedFile.type === 'application/pdf') {
-        setFile(droppedFile)
-      } else {
-        alert('Please upload a PDF file')
-      }
+      await processFile(droppedFile)
     }
   }
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      const selectedFile = e.target.files[0]
-      if (selectedFile.type === 'application/pdf') {
-        setFile(selectedFile)
-      } else {
-        alert('Please upload a PDF file')
-      }
+      await processFile(e.target.files[0])
     }
+  }
+
+  const processFile = async (selectedFile: File) => {
+    const validTypes = ['text/plain', 'application/pdf']
+    
+    if (!validTypes.includes(selectedFile.type)) {
+      alert('Please upload a .txt or .pdf file')
+      return
+    }
+
+    setFile(selectedFile)
+
+    // Read the file as text
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      const text = e.target?.result as string
+      setResumeText(text)
+    }
+    reader.readAsText(selectedFile)
   }
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    if (file && jobDescriptionUrl) {
-      onEvaluate(file, jobDescriptionUrl)
+    if (resumeText && jobDescriptionUrl) {
+      onEvaluate(resumeText, jobDescriptionUrl)
     } else {
       alert('Please upload a resume and provide a job description URL')
     }
@@ -61,7 +72,7 @@ export default function ResumeUploader({ onEvaluate, loading }: ResumeUploaderPr
     <form onSubmit={handleSubmit} className="space-y-6">
       <div>
         <label htmlFor="resume" className="block text-sm font-medium text-gray-700 mb-2">
-          Upload Resume (PDF)
+          Upload Resume (TXT or PDF)
         </label>
         <div
           onDragEnter={handleDrag}
@@ -77,7 +88,7 @@ export default function ResumeUploader({ onEvaluate, loading }: ResumeUploaderPr
           <input
             type="file"
             id="resume"
-            accept=".pdf"
+            accept=".txt,.pdf"
             onChange={handleFileChange}
             className="hidden"
           />
@@ -101,9 +112,24 @@ export default function ResumeUploader({ onEvaluate, loading }: ResumeUploaderPr
             <span className="text-gray-600 font-medium">
               {file ? file.name : 'Click to upload or drag and drop'}
             </span>
-            <span className="text-sm text-gray-500 mt-1">PDF only</span>
+            <span className="text-sm text-gray-500 mt-1">TXT or PDF files</span>
           </label>
         </div>
+
+        {resumeText && (
+          <div className="mt-4">
+            <label htmlFor="resumeTextArea" className="block text-sm font-medium text-gray-700 mb-2">
+              Resume Content (you can edit this)
+            </label>
+            <textarea
+              id="resumeTextArea"
+              value={resumeText}
+              onChange={(e) => setResumeText(e.target.value)}
+              rows={8}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono text-sm"
+            />
+          </div>
+        )}
       </div>
 
       <div>
@@ -129,7 +155,7 @@ export default function ResumeUploader({ onEvaluate, loading }: ResumeUploaderPr
 
       <button
         type="submit"
-        disabled={loading || !file || !jobDescriptionUrl}
+        disabled={loading || !resumeText || !jobDescriptionUrl}
         className="w-full bg-blue-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors flex items-center justify-center"
       >
         {loading ? (
@@ -163,4 +189,3 @@ export default function ResumeUploader({ onEvaluate, loading }: ResumeUploaderPr
     </form>
   )
 }
-
